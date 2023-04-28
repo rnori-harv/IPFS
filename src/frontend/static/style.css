@@ -1,0 +1,93 @@
+input[type="file"] {
+    display: none;
+}
+label[for="file"] {
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+  }
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+.btn-group input[type="file"] {
+    margin-right: 10px;
+  }
+
+  .custom-file-input {
+    z-index: 2;
+    position: relative;
+    overflow: hidden;
+    margin: 0.5px;
+  }
+  
+  .custom-file-label {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    line-height: 2.5em;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+  }
+/* styles for IPFS-mini website */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    color: #fff;
+  }
+
+
+.btn {
+    border: none;
+    color: white;
+    background-color: #007aff;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
+.upload-btn-wrapper input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin: auto;
+    width: 50%;
+    margin-left: 17%;
+  }
+  .btn-group input[type="file"], 
+  .btn-group input[type="submit"] {
+    width: 20%;
+    margin: 5px;
+  }
+
+  
+  

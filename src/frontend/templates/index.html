@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>IPFS-mini</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 48px;
+            color: #000000;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>IPFS-mini</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data" class="text-center">      
+      <div class="btn-group">
+        <label for="file" class="btn btn-primary mt-3">Choose File</label>
+        <input type="file" name="file" id="file" class="custom-file-input btn btn-primary mt-3">
+        <input type="submit" value="Upload" class="btn btn-primary mt-3">
+      </div>
+    </form>
+    <br>
+    <br>
+    <a href="/retrieve" >Retrieve file</a>
+  </body>
+</html>

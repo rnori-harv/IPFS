@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>IPFS-mini - Retrieve</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+        h1 {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 48px;
+            color: #000000;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>IPFS-mini - Retrieve</h1>
+    <form action="/retrieve" method="get" class="text-center">      
+      <div class="form-group">
+        <label for="hash">IPFS Hash:</label>
+        <input type="text" name="hash" id="hash" class="form-control">
+      </div>
+      <input type="submit" value="Retrieve" class="btn btn-primary mt-3">
+    </form>
+  </body>
+</html>
