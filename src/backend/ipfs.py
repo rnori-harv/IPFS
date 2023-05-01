@@ -3,11 +3,13 @@ import json
 import os
 import socket
 import threading
+from threading import Thread
+import sys
+import time
+import random
 
 # Define constants
-BLOCK_SIZE = 1024 * 1024  # 1 MB
-IPFS_PORT = 5001
-
+BLOCK_SIZE = 1024
 # Define a class to keep track of uploaded files
 class FileStorage:
     def __init__(self):
@@ -23,6 +25,9 @@ class FileStorage:
             return self._files[file_hash]
         else:
             return None
+    
+    def has_file(self, file_hash):
+        return file_hash in self._files
 
     def _calculate_file_hash(self, file_path):
         with open(file_path, 'rb') as f:
@@ -31,9 +36,10 @@ class FileStorage:
 
 # Define a class to represent a node in the IPFS network
 class IPFSNode:
-    def __init__(self, file_storage):
+    def __init__(self, file_storage, address):
         self._file_storage = file_storage
         self._peers = set()
+        self._address =  address
 
     def add_peer(self, peer_address):
         self._peers.add(peer_address)
@@ -63,7 +69,7 @@ class IPFSNode:
         return False
 
     def _split_file(self, file_path):
-        with open(file_path, 'rb') as f:
+        with open(file_path) as f:
             chunks = []
             while True:
                 block = f.read(BLOCK_SIZE)
@@ -77,6 +83,8 @@ class IPFSNode:
         for chunk in chunks:
             chunk_hash = hashlib.sha256(chunk).hexdigest()
             node_list.append({'Data': chunk, 'Hash': chunk_hash, 'Links': []})
+            # send chunk to a random peer
+            self._send_file_to_peer(chunk, random.choice(list(self._peers)))
         while len(node_list) > 1:
             new_node_list = []
             for i in range(0, len(node_list), 2):
@@ -157,17 +165,118 @@ class IPFSNode:
         with open(output_file_path, 'wb') as f:
             for chunk in chunks:
                 f.write(chunk)
+    ## add logic for peers to do all of the requested actions
+
+    def _handle_peer(self, conn, addr):
+        with conn:
+            print('Connected by', addr)
+            while True:
+                data = conn.recv(BLOCK_SIZE)
+                if not data:
+                    break
+                print('Received', repr(data))
+                if data == b'CLIENTUPLOAD':
+                    self._handle_client_upload(conn)
+                elif data == b'CLIENTDOWNLOAD':
+                    self._handle_client_download(conn)
+                elif data == b'UPLOAD':
+                    self._handle_upload(conn)
+                elif data == b'LOOKUP':
+                    self._handle_lookup(conn)
+                elif data == b'DOWNLOAD':
+                    self._handle_download(conn)
+                else:
+                    print('Unknown command: {}'.format(data))
+    
+    
+    def _handle_client_upload(self, conn):
+        filename = b''
+        while True:
+            block = conn.recv(BLOCK_SIZE)
+            if not block:
+                break
+            filename += block
+        filename = filename.decode('utf-8')
+        hash = self.upload_file(filename)
+        conn.sendall(bytes(hash, 'utf-8'))
+        
+    
+    def _handle_client_download(self, conn):
+        file_hash = b''
+        while True:
+            block = conn.recv(BLOCK_SIZE)
+            if not block:
+                break
+            file_hash += block
+        file_hash = file_hash.decode('utf-8')
+        output_file_path = file_hash + '.txt'
+        self.download_file(file_hash, output_file_path)
+        conn.sendall(b'ACK')
+
+    def _handle_upload(self, conn):
+        file_dag_json = b''
+        while True:
+            block = conn.recv(BLOCK_SIZE)
+            if not block:
+                break
+            file_dag_json += block
+        file_dag = json.loads(file_dag_json.decode('utf-8'))
+        self._file_storage.add_file(file_dag)
+        conn.sendall(b'ACK')
+    
+    def _handle_lookup(self, conn):
+        file_hash = b''
+        while True:
+            block = conn.recv(BLOCK_SIZE)
+            if not block:
+                break
+            file_hash += block
+        file_hash = file_hash.decode('utf-8')
+        if self._file_storage.has_file(file_hash):
+            conn.sendall(b'FOUND')
+        else:
+            conn.sendall(b'NOT_FOUND')
+    
+    def _handle_download(self, conn):
+        file_hash = b''
+        while True:
+            block = conn.recv(BLOCK_SIZE)
+            if not block:
+                break
+            file_hash += block
+        file_hash = file_hash.decode('utf-8')
+        file_dag = self._file_storage.get_file(file_hash)
+        file_dag_json = json.dumps(file_dag)
+        conn.sendall(bytes(file_dag_json, 'utf-8'))
+    
+    def _start_server(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(self._address)
+            s.listen()
+            while True:
+                conn, addr = s.accept()
+                self._handle_peer(conn, addr)
 
 
 
-if __name__ == '__main__':
+def serve(port):
     file_storage = FileStorage()
-    ipfs_node = IPFSNode(file_storage)
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+1))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+2))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+3))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+4))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+5))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+6))
-    ipfs_node.add_peer(('127.0.0.1', IPFS_PORT+7))
+    addr = ('127.0.0.1', port)
+    ipfs_node = IPFSNode(file_storage, addr)
+    ports = [50051, 50052, 50053, 50054, 50055, 50056, 50057, 50058]
+    ipfs_node.add_peer(('127.0.0.1', ports[0]))
+    ipfs_node.add_peer(('127.0.0.1', ports[1]))
+    ipfs_node.add_peer(('127.0.0.1', ports[2]))
+    ipfs_node.add_peer(('127.0.0.1', ports[3]))
+    ipfs_node.add_peer(('127.0.0.1', ports[4]))
+    ipfs_node.add_peer(('127.0.0.1', ports[5]))
+    ipfs_node.add_peer(('127.0.0.1', ports[6]))
+    ipfs_node.add_peer(('127.0.0.1', ports[7]))
+
+    t = Thread(target=ipfs_node._start_server)
+    t.start()
+    time.sleep(5)
+    # take the test.txt file in frontend/ and upload it to the network
+    if port == 50051:
+        file_hash = ipfs_node.upload_file('test.txt')
+        print('Uploaded file with hash: {}'.format(file_hash))
