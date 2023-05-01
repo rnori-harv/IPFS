@@ -18,9 +18,7 @@ def upload_file():
     # Save the file to disk
     uploaded_file.save(filename)
     # Run the Python script
-    import os
-    ## 
-    os.system('python ../backend/process.py ' + filename)
+    print(open(filename).read())
     return 'File uploaded and processed successfully.'
 
 if __name__ == '__main__':
