@@ -223,31 +223,35 @@ class IPFSNode:
     
     
     def _handle_client_upload(self, conn):
-        time.sleep(0.5)
+        conn.sendall(b'ACK')
         filename = b''
         while True:
             block = conn.recv(BLOCK_SIZE)
-            if not block:
+            if block == b'DONE':
                 break
             filename += block
         filename = filename.decode('utf-8')
+        print("SERVER RECEIVED FILENAME: {}".format(filename))
         hash = self.upload_file(filename)
         conn.sendall(bytes(hash, 'utf-8'))
         
     
     def _handle_client_download(self, conn):
+        conn.sendall(b'ACK')
         file_hash = b''
         while True:
             block = conn.recv(BLOCK_SIZE)
-            if not block:
+            if block == b'DONE':
                 break
             file_hash += block
         file_hash = file_hash.decode('utf-8')
         output_file_path = file_hash + '.txt'
+        print("starting download to " + str(output_file_path))
         self.download_file(file_hash, output_file_path)
-        conn.sendall(b'ACK')
+        conn.sendall(output_file_path.encode('utf-8'))
 
     def _handle_upload(self, conn):
+        time.sleep(0.5)
         conn.sendall(b'ACK')
         file_content = b''
         while True:
@@ -304,7 +308,6 @@ def serve(port):
     addr = ('127.0.0.1', port)
     ipfs_node = IPFSNode(file_storage, addr)
     ports = [50051, 50052, 50053, 50054, 50055, 50056, 50057, 50058]
-    ipfs_node.add_peer(('127.0.0.1', ports[0]))
     ipfs_node.add_peer(('127.0.0.1', ports[1]))
     ipfs_node.add_peer(('127.0.0.1', ports[2]))
     ipfs_node.add_peer(('127.0.0.1', ports[3]))
@@ -316,7 +319,8 @@ def serve(port):
     t = Thread(target=ipfs_node._start_server)
     t.start()
     time.sleep(5)
-    # take the test.txt file in frontend/ and upload it to the network
+    # take the test.txt file in frontend/ and upload it to the network using primary server (port 50051)
+    '''
     if port == 50051:
         file_hash = ipfs_node.upload_file('test.txt')
         # hash the file with SHA-256 and print it
@@ -338,3 +342,4 @@ def serve(port):
         # download the file from the network
         output_file_path = file_hash + '.txt'
         ipfs_node.download_file(file_hash, output_file_path)
+    '''
