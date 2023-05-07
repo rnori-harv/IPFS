@@ -22,6 +22,8 @@ To implement IPFS, we will need to spin up multiple servers, come up with a way 
 
 ## Creating an IPFS Node
 
+The IPFS node will be the core data structure that does all operations related to IPFS. We will utilize a primary secondary server structure for our IPFS nodes. Our primary IPFS nodes will handle client requests for uploading and retrieving a file. It will also delegate file chunk uploading / retrieval from peer IPFS nodes. Our secondary IPFS nodes will be responsible for storing file chunks, keep track of their corresponding hashes, and handle primary server requests to either store a file chunk within the secondary server or retrieve the chunk corresponding to a given file hash. The following subsections will go over our implementation for the primary and secondary IPFS nodes. 
+
 ### Splitting Files
 
 Within our primary IPFS node, we need to split up a given file into chunks, create a merkle DAG out of the hashes of these chunks, and send the chunks to peer IPFS nodes for storage. 
@@ -61,6 +63,31 @@ After this Merkle DAG is created, we will then have our primary server randomly 
 
 ## User Experience Walthrough
 For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file.
+
+## Takeaways
+This project was a great opportunity for both of us to truly understand a protocol that we have both used as a part of our ventures in web3. Having worked on it, we now understand why IPFS is such a cornerstone of the blockchain ecosystem because of the underlying data structures. 
+
+As a distributed system, we enjoyed the elegance of the underlying data structures within IPFS. In particular, the Merkle Tree was a robust yet simple data structure that was easily integrated into our distributed system logic.
+
+Our primary structure was understanding how to boil down a very complex system such as IPFS into a simple version that was built on concepts we learned in class. Our primary secondary strucutre adopted from design project 3 helped us figure out a mechanism for server to server interaction. Furthermore, sockets from project one also helped us devise client-server communication protocols. We believe that this project was a good combination of key concepts that we learned throughout the 262 curriculum and reflect our growth as distributed system engineers. 
+
+## Future Work
+While the implementation of IPFS for text files has been a success, there is still more work that can be done to improve the system. The following are some future work items that can be pursued to enhance the functionality and robustness of the system:
+
+1. Uploads for different file types: 
+Currently, the implementation only supports text files. To make the system more versatile, it is important to support uploads for different file types, including audio, video, and images. This can be achieved by modifying the file handling system to recognize and store different file formats.
+
+2. Making the web client more robust and hosting it on a domain:
+The web client is an important part of the system as it provides the interface for users to interact with the files. To make the system more accessible, it is necessary to make the web client more robust by implementing features such as search and filtering. Additionally, hosting the web client on a domain will make it easier for users to access the system.
+
+3. Hosting IPFS across multiple machines:
+Currently, the implementation is running on a single machine. However, as the system grows, it will be necessary to host IPFS across multiple machines to ensure scalability and redundancy. This can be achieved by setting up a cluster of IPFS nodes that can communicate with each other to store and retrieve files.
+
+4. Fault tolerance, replication, and file preservation:
+To ensure the longevity and reliability of the system, it is important to implement fault tolerance, replication, and file preservation mechanisms. Fault tolerance can be achieved by implementing redundant storage across multiple nodes, so that if one node goes down, the files can still be accessed from other nodes. Replication can be achieved by storing multiple copies of files across different nodes, so that if one copy becomes unavailable, another copy can be accessed. Finally, file preservation can be achieved by periodically backing up the files to a separate location, to ensure that they are not lost in case of a catastrophic failure.
+
+
+
 
 
 ## References
