@@ -1,5 +1,5 @@
 # Engineering Notebook for Final Project:
-Engineering notebook of our Proof for our mini-IPFS implementation. Final Project for CS 262 @ harvard.
+Engineering notebook of our Proof for our mini-IPFS implementation. Final Project for CS 262 @ Harvard.
 
 
 ## Introduction to IPFS
@@ -11,26 +11,26 @@ IPFS stores multiple copies of files across different nodes in the network, prov
 
 To ensure data integrity, IPFS uses cryptographic hashing to create unique content identifiers (CIDs) for each file. This means that identical files will have the same CID, and any changes made to a file will result in a new CID. This ensures that files cannot be tampered with or altered without detection, providing a secure and reliable way to store and share data.
 
-IPFS has many potential use cases, including decentralized web hosting, distributed databases, peer-to-peer content delivery, and more. Its open-source nature and community-driven development make it an exciting and rapidly evolving technology that is changing the way we think about data storage and sharing on the internet.
+IPFS has many potential use cases, including decentralized web hosting, distributed databases, peer-to-peer content delivery, and more. Its open-source nature and community-driven development make it an exciting and rapidly evolving technology that is changing the way we think about data storage and sharing on the Internet.
 
 
 ## Project Goal
-For our CS 262 final project, we seek to recreate a mini-version of the IPFS protocol and then simulate a proof of concept with storing and retrieving a simple text file. That goal will involve the following: designing a data structure to represent files, implementing IPFS nodes that are capable of storing chunks of data, implementing communication between IPFS nodes, and building a web-based UI in which a user can upload files to receive a hash as well as input a hash to receive files. 
+For our CS 262 final project, we seek to recreate a mini-version of the IPFS protocol and then simulate a proof of concept by storing and retrieving a simple text file. That goal will involve the following: designing a data structure to represent files, implementing IPFS nodes that are capable of storing chunks of data, implementing communication between IPFS nodes, and building a web-based UI in which a user can upload files to receive a hash as well as input a hash to receive files. 
 
 ## Implementation Methodology
-To implement IPFS, we will need to spin up multiple servers, come up with a way to allocate file chunks across different servers, and implement a way to recreate files across different machines. The sections below detail the choices we made implementing all of the features needed for our user experience.
+To implement IPFS, we will need to spin up multiple servers, come up with a way to allocate file chunks across different servers and implement a way to recreate files across different machines. The sections below detail the choices we made in implementing all of the features needed for our user experience.
 
 ## Creating an IPFS Node
 
-The IPFS node will be the core data structure that does all operations related to IPFS. We will utilize a primary secondary server structure for our IPFS nodes. Our primary IPFS nodes will handle client requests for uploading and retrieving a file. It will also delegate file chunk uploading / retrieval from peer IPFS nodes. Our secondary IPFS nodes will be responsible for storing file chunks, keep track of their corresponding hashes, and handle primary server requests to either store a file chunk within the secondary server or retrieve the chunk corresponding to a given file hash. The following subsections will go over our implementation for the primary and secondary IPFS nodes. 
+The IPFS node will be the core data structure that does all operations related to IPFS. We will utilize a primary secondary server structure for our IPFS nodes. Our primary IPFS nodes will handle client requests for uploading and retrieving files. It will also delegate file chunk uploading / retrieval from peer IPFS nodes. Our secondary IPFS nodes will be responsible for storing file chunks, keeping track of their corresponding hashes, and handling primary server requests to either store a file chunk within the secondary server or retrieve the chunk corresponding to a given file hash. The following subsections will go over our implementation for the primary and secondary IPFS nodes. The IPFS node can be found in `backend/ipfs.py`. 
 
 ### Splitting Files
 
-Within our primary IPFS node, we need to split up a given file into chunks, create a merkle DAG out of the hashes of these chunks, and send the chunks to peer IPFS nodes for storage. 
+Within our primary IPFS node, we need to split up a given file into chunks, create a Merkle DAG out of the hashes of these chunks, and send the chunks to peer IPFS nodes for storage. 
 
 To split our file into chunks, we first chose a standard block size (256 bytes). Then, when a client uploads a file to the primary IPFS node, it 
 
-Next, for file storage we rely on the Merkle Directed Acyclic Graph Data structure (Merkle DAG). 
+Next, for file storage, we rely on the Merkle Directed Acyclic Graph Data structure (Merkle DAG). 
 
 A Merkle DAG (Directed Acyclic Graph) is a data structure used by IPFS to efficiently store and retrieve files in a decentralized network. In a Merkle DAG, each node represents a piece of data, and each edge represents a cryptographic hash that links nodes together. The result is a tree-like structure where every node is uniquely identified by a hash of its contents and the hashes of its children.
 
@@ -43,25 +43,25 @@ Merkle DAGs are well-suited for IPFS since they verify the integrity of files wi
 
 Using a Merkle DAG also allows IPFS to efficiently store and retrieve files by only requesting the specific pieces of data needed to reconstruct a file, rather than downloading the entire file from a central server. This reduces bandwidth usage and improves download speeds, making IPFS a more scalable and efficient alternative to traditional web technologies.
 
-For us, the leafs of the merkle DAG will be the hashes of the chunks that we are sending to other peer IPFS nodes for storage. 
+For us, the leaves of the Merkle DAG will be the hashes of the chunks we are sending to other peer IPFS nodes for storage. 
 
 After this Merkle DAG is created, we will then have our primary server randomly assign chunks to different online peer IPFS nodes. 
 
 
 ### Handling Server-to-Server Communication
 
+#### Receiving Chunks
 
+For our secondary IPFS nodes, we have to add logic for receiving 
 
-#### Sending Chunks
-
-#### Retrieving Files / Chunks
+#### Sending Files / Chunks
 
 
 ### Handling Client-Server Requests
 
 
 
-## User Experience Walthrough
+## User Experience Walkthrough
 For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file.
 
 ## Takeaways
@@ -69,7 +69,7 @@ This project was a great opportunity for both of us to truly understand a protoc
 
 As a distributed system, we enjoyed the elegance of the underlying data structures within IPFS. In particular, the Merkle Tree was a robust yet simple data structure that was easily integrated into our distributed system logic.
 
-Our primary structure was understanding how to boil down a very complex system such as IPFS into a simple version that was built on concepts we learned in class. Our primary secondary strucutre adopted from design project 3 helped us figure out a mechanism for server to server interaction. Furthermore, sockets from project one also helped us devise client-server communication protocols. We believe that this project was a good combination of key concepts that we learned throughout the 262 curriculum and reflect our growth as distributed system engineers. 
+Our primary structure was understanding how to boil down a very complex system such as IPFS into a simple version that was built on concepts we learned in class. Our primary secondary structure adopted from design project 3 helped us figure out a mechanism for server-to-server interaction. Furthermore, sockets from project one also helped us devise client-server communication protocols. We believe that this project was a good combination of key concepts that we learned throughout the 262 curricula and reflect our growth as distributed system engineers. 
 
 ## Future Work
 While the implementation of IPFS for text files has been a success, there is still more work that can be done to improve the system. The following are some future work items that can be pursued to enhance the functionality and robustness of the system:
@@ -96,6 +96,7 @@ https://docs.ipfs.tech/concepts/how-ipfs-works/
 https://docs.ipfs.tech/concepts/merkle-dag/
 https://decrypt.co/resources/how-to-use-ipfs-the-backbone-of-web3
 https://www.researchgate.net/figure/An-illustration-of-a-Merkle-Tree_fig4_339067478
+
 
 
 
