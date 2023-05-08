@@ -15,3 +15,6 @@ Go the frontend directory and type `flask run` into your shell to launch the cli
 ### Write-up
 Our writeup can be found in `NOTEBOOK.md`
 
+### Presentation
+Our presentation can be found here: https://docs.google.com/presentation/d/18Vgy-7vxdFqn-eWFeF4L_NNJUJPCPG6VGplK7NkejU4/edit?usp=sharing
+
