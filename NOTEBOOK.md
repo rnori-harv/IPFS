@@ -22,7 +22,11 @@ To implement IPFS, we will need to spin up multiple servers, come up with a way 
 
 ## Creating an IPFS Node
 
-The IPFS node will be the core data structure that does all operations related to IPFS. We will utilize a primary secondary server structure for our IPFS nodes. Our primary IPFS nodes will handle client requests for uploading and retrieving files. It will also delegate file chunk uploading / retrieval from peer IPFS nodes. Our secondary IPFS nodes will be responsible for storing file chunks, keeping track of their corresponding hashes, and handling primary server requests to either store a file chunk within the secondary server or retrieve the chunk corresponding to a given file hash. The following subsections will go over our implementation for the primary and secondary IPFS nodes. The IPFS node can be found in `backend/ipfs.py`. 
+The IPFS node will be the core data structure that does all operations related to IPFS. We will utilize a primary secondary server structure for our IPFS nodes. Here is an illustration outlining that structure:
+
+![Primary Secondary Illustration](primary.png)
+
+Our primary IPFS nodes will handle client requests for uploading and retrieving files. It will also delegate file chunk uploading / retrieval from peer IPFS nodes. Our secondary IPFS nodes will be responsible for storing file chunks, keeping track of their corresponding hashes, and handling primary server requests to either store a file chunk within the secondary server or retrieve the chunk corresponding to a given file hash. The following subsections will go over our implementation for the primary and secondary IPFS nodes. The IPFS node can be found in `backend/ipfs.py`. 
 
 ### Splitting Files
 
