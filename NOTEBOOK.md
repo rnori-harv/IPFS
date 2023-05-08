@@ -52,17 +52,29 @@ After this Merkle DAG is created, we will then have our primary server randomly 
 
 #### Receiving Chunks
 
-For our secondary IPFS nodes, we have to add logic for receiving 
+For our secondary IPFS nodes, we have to add logic to handle requests from the primary node to store chunks of data. The primary server sends the chunk to the secondary server, and the secondary server then has an itnernal method that stores the file and its correspdonding hash. 
 
 #### Sending Files / Chunks
 
+We also added a method in which our primary server sends the hash for a chunk its looking for, and our peer IPFS node determines whether it actually has chunk content stored corresponding to that hash and then returns it if it does.
 
 ### Handling Client-Server Requests
+
+#### Uploading Files
+
+The primary server will take the file content, split it into chunks, calculate their hashes, and store it in a merkle tree such that the leaf nodes are the chunk hashes. After this, the primary server then allocates each of the chunks to a random secondary IPFS server, which stores the chunk using the methods detailed above. After this, the primary server returns the overall hash of the file, which is the root for the merkle DAG and used to access the tree for file retrieval. 
+
+#### Retrieving Files by Hash
+
+
+
 
 
 
 ## User Experience Walkthrough
-For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file.
+For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file. Refer to our presentation and the 
+
+![demo video](https://youtu.be/7pb1xL8tR-g)
 
 ## Takeaways
 This project was a great opportunity for both of us to truly understand a protocol that we have both used as a part of our ventures in web3. Having worked on it, we now understand why IPFS is such a cornerstone of the blockchain ecosystem because of the underlying data structures. 
@@ -88,14 +100,13 @@ To ensure the longevity and reliability of the system, it is important to implem
 
 
 
-
-
 ## References
 https://en.wikipedia.org/wiki/InterPlanetary_File_System
 https://docs.ipfs.tech/concepts/how-ipfs-works/
 https://docs.ipfs.tech/concepts/merkle-dag/
 https://decrypt.co/resources/how-to-use-ipfs-the-backbone-of-web3
 https://www.researchgate.net/figure/An-illustration-of-a-Merkle-Tree_fig4_339067478
+https://levelup.gitconnected.com/deep-dive-into-primary-secondary-replication-for-fault-tolerance-6ba203b06901
 
 
 
