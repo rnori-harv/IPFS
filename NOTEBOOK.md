@@ -66,15 +66,12 @@ The primary server will take the file content, split it into chunks, calculate t
 
 #### Retrieving Files by Hash
 
-
-
+The primary server takes in the file hash and then retrieves the corresponding Merkle DAG. Using this tree, it goes to each of the leaf nodes and queries all of its peers to determine which one(s) contain the chunk. It then retrieves it from the node that does have it. It repeats this process until it has all of the chunk content and then joins them together to have the reconstructed file. It then returns this file to the user. 
 
 
 
 ## User Experience Walkthrough
-For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file. Refer to our presentation and the 
-
-![demo video](https://youtu.be/7pb1xL8tR-g)
+For IPFS, we will launch a simple website that has two pages. The first will allow a user to upload a file and store it on the IPFS servers. This first page will return an overall hash for the file that the user can later use for file retrieval. The second page will take the overall hash for the file and then print the reconstructed file onto the webpage. Hence, all the user needs to do is have their file on their computer and keep track of their hash to retrieve the file. Here is our demo video showing the user experience walkthrough: (https://youtu.be/7pb1xL8tR-g).
 
 ## Takeaways
 This project was a great opportunity for both of us to truly understand a protocol that we have both used as a part of our ventures in web3. Having worked on it, we now understand why IPFS is such a cornerstone of the blockchain ecosystem because of the underlying data structures. 
