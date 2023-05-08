@@ -14,6 +14,7 @@ def index():
 def retrieve():
     return render_template('ret.html')
 
+# upload file page
 @app.route('/upload', methods=['POST'])
 def upload_file():
     uploaded_file = request.files['file']
@@ -51,7 +52,6 @@ def upload_file():
     return 'File uploaded successfully. Hash: ' + hash
 
 # make the app route /retrieve + the value of hash
-
 @app.route('/retrieve', methods=['GET'])
 def retrieve_file():
     hash_value = request.args.get('hash')

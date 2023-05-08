@@ -33,18 +33,22 @@ class FileStorage:
 
 # Define a class to represent a node in the IPFS network
 class IPFSNode:
+    # Initialize the node with a file storage object and an address
     def __init__(self, file_storage, address):
         self._file_storage = file_storage
         self._peers = set()
         self._address =  address
         self.dags = {}
 
+    # Add a peer to the node's list of peers
     def add_peer(self, peer_address):
         self._peers.add(peer_address)
 
+    # Remove a peer from the node's list of peers
     def remove_peer(self, peer_address):
         self._peers.remove(peer_address)
 
+    # Upload a file to the network
     def upload_file(self, file_path):
         # Split the file into smaller chunks
         file_chunks = self._split_file(file_path)
@@ -56,6 +60,7 @@ class IPFSNode:
         # store the merkle DAG on primary server
         return file_hash
 
+    # Download a file from the network
     def download_file(self, file_hash, output_file_path):
         mt = self.dags[file_hash]
         leaf_count = mt.get_leaf_count()
@@ -78,6 +83,7 @@ class IPFSNode:
             
 
 
+    # Split a file into smaller chunks
     def _split_file(self, file_path):
         with open(file_path, 'rb') as f:
             chunks = []
@@ -88,6 +94,7 @@ class IPFSNode:
                 chunks.append(block)
             return chunks
 
+    # Create a Merkle DAG for a file
     def _create_file_dag(self, chunks):
         for chunk in chunks:
             self._send_file_to_peer(chunk, random.choice(list(self._peers)))
@@ -98,6 +105,7 @@ class IPFSNode:
         self.dags[mt.get_merkle_root()] = mt
         return mt
 
+    # Send a file chunk to a peer
     def _send_file_to_peer(self, chunk, peer_address):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -124,6 +132,7 @@ class IPFSNode:
             except:
                 print('Failed to send file to peer: {}'.format(peer_address))
 
+    # Lookup a file in the network
     def _lookup_file_peers(self, file_hash):
         peers_with_file = []
         for peer_address in self._peers:
@@ -131,6 +140,7 @@ class IPFSNode:
                 peers_with_file.append(peer_address)
         return peers_with_file
 
+    # Check if a peer has a file
     def _check_peer_for_file(self, file_hash, peer_address):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -160,6 +170,7 @@ class IPFSNode:
                 print("FAILING LOOKUP")
                 return False
 
+    # Request a file from a peer
     def _request_file_from_peer(self, file_hash, peer_address):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
@@ -190,18 +201,7 @@ class IPFSNode:
                 print("FAILING DOWNLOAD")
                 return False
 
-    def _retrieve_file_from_dag(self, file_dag, output_file_path):
-        chunks = []
-        for link in file_dag['Links']:
-            if link['Name'] == 'left':
-                chunks.extend(self._retrieve_file_from_dag(link, output_file_path))
-            elif link['Name'] == 'right':
-                chunks.extend(self._retrieve_file_from_dag(link, output_file_path))
-        chunks.append(file_dag['Data'])
-        with open(output_file_path, 'wb') as f:
-            for chunk in chunks:
-                f.write(chunk)
-
+    # Handle all the calls an IPFS node can receive
     def _handle_peer(self, conn, addr):
         with conn:
             while True:
@@ -222,6 +222,7 @@ class IPFSNode:
                     print('Unknown command: {}'.format(data))
     
     
+    # FOR PRIMARY SERVER: Handle a client uploading a file
     def _handle_client_upload(self, conn):
         conn.sendall(b'ACK')
         filename = b''
@@ -236,6 +237,7 @@ class IPFSNode:
         conn.sendall(bytes(hash, 'utf-8'))
         
     
+    # FOR PRIMARY SERVER: handle a client retrieving a file by hash
     def _handle_client_download(self, conn):
         conn.sendall(b'ACK')
         file_hash = b''
@@ -250,6 +252,7 @@ class IPFSNode:
         self.download_file(file_hash, output_file_path)
         conn.sendall(output_file_path.encode('utf-8'))
 
+    # FOR PEER NODES: Handle a primary server requesting this peer to upload chunk
     def _handle_upload(self, conn):
         time.sleep(0.5)
         conn.sendall(b'ACK')
@@ -265,6 +268,7 @@ class IPFSNode:
         #print(self._file_storage.get_file(hash))
         conn.sendall(b'DONE')
     
+    # FOR PEER NODES: Handle a primary server requesting this peer to lookup chunk by hash
     def _handle_lookup(self, conn):
         conn.sendall(b'ACK')
         file_hash = b''
@@ -279,6 +283,7 @@ class IPFSNode:
         else:
             conn.sendall(b'NOT_FOUND')
     
+    # FOR PEER NODES: Handle a primary server requesting this peer to download chunk by hash
     def _handle_download(self, conn):
         conn.sendall(b'ACK')
         file_hash = b''
@@ -293,6 +298,7 @@ class IPFSNode:
         time.sleep(0.1)
         conn.sendall(b'DONE')
     
+    # Start a server to listen for requests
     def _start_server(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(self._address)
@@ -303,6 +309,7 @@ class IPFSNode:
 
 
 
+# Start an IPFS node on a given port
 def serve(port):
     file_storage = FileStorage()
     addr = ('127.0.0.1', port)
@@ -321,6 +328,7 @@ def serve(port):
     time.sleep(5)
     # take the test.txt file in frontend/ and upload it to the network using primary server (port 50051)
     '''
+    TEST UPLOAD AND DOWNLOAD
     if port == 50051:
         file_hash = ipfs_node.upload_file('test.txt')
         # hash the file with SHA-256 and print it
